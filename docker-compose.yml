@@ -17,3 +17,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: recommended_books
+    volumes:
+     - recommended-books-data:/var/lib/postgresql/data
+volumes:
+  recommended-books-data:
+    external: true

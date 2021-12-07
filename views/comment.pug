@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  form(method="post", action="/recommendations")
+    div
+      h5 カテゴリ名：#{categoryName}
+      input(type="hidden" name="categoryId" value=categoryId)
+    
+    div
+      h5 書籍名: #{recommendation.bookName}
+      input(type="hidden" name="bookName" value=recommendation.bookName)
+      input(type="hidden" name="recommendId" value=recommendation.recommendId)
+
+      
+    div
+      h5 コメント
+      textarea(name="comment")
+    button(type="submit") コメントを投稿する

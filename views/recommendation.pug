@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  h3 カテゴリー：#{cName}
+  
+  p 作成者: #{cCreatedBy}
+
+  div
+      a(href=`/recommendations/${categoryId}/book`)  別の書籍を投稿する
+      div
+        a(href="/recommendations/new") カテゴリを新しく登録して本をおすすめする
+
+  table
+    tr
+      th おすすめの書籍
+        th #{bookName}
+          th 
+            a(href=`/recommendations/${categoryId}/${recommendId}/comment`) コメントを追加する
+    tr
+      th 書評
+        th #{introduction}
+        - for (var key of bookCommentsMap.keys())
+          tr
+            - var value = bookCommentsMap.get(key)
+          if (isComment)
+            th 投稿者
+            th コメント
+            tr  
+              td #{key}
+              td #{value}

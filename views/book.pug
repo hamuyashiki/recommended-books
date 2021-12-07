@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  form(method="post", action="/recommendations")
+    div
+      h5 カテゴリ名: #{cName}
+      input(type="hidden" name="categoryId" value=categoryId)      
+    div
+      h5 書籍名
+      input(type="text" name="bookName" required)
+    div
+      h5 書評
+      textarea(name="introduction" required)
+    button(type="submit") おすすめする本を追加する

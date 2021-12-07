@@ -3,3 +3,24 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+  div
+    if user
+      div
+        a(href="/logout") #{user.username} をログアウト
+      div
+        a(href="/recommendations/new") カテゴリを新しく登録して本をおすすめする
+        - var hascategory = categories.length > 0
+      if hascategory
+        h3 カテゴリー一覧
+        table.table
+          tr
+            th カテゴリー名
+            th 作成日時
+          each category in categories
+            tr
+              td
+                a(href=`/recommendations/${category.categoryId}`) #{category.categoryName}
+              td #{category.updatedAt}
+    else
+      div
+        a(href="/login") ログイン

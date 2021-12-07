@@ -1,0 +1,24 @@
+extends layout
+
+block content
+    div
+      h5 カテゴリ名: #{cName}
+      a(href=`/recommendations/${categoryId}/book`)  別の書籍を投稿する
+      input(type="hidden" name="categoryId" value=categoryId)    
+      div
+        - var hasbook = bookNamesMap.size > 0
+      if hasbook
+        h3 書籍一覧
+        table.table
+          tr
+            th 書籍名
+                th 更新日時
+                  th コメント数
+            - for (var key of bookNamesMap.keys())
+          
+                tr
+                td
+                    a(href=`/recommendations/${categoryId}/${key}`) #{key}
+                - var value = bookNamesMap.get(key)
+                td #{value}
+    
