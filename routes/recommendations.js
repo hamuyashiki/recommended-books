@@ -28,6 +28,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
         createdBy: req.user.id,
         updatedAt: updatedAt,
         introduction: req.body.introduction
+        // commentNum: 0
       })
         .then((r) => {
           /*
@@ -56,6 +57,34 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
           postedBy: req.user.id,
           comment: req.body.comment,
           updatedAt: updatedAt
+
+        // TO DO  ここでRecommendationのコメント数をインクリメントする
+        /* 
+        Comment.findOne({
+          where:{ recommendId: req.body.recommendId, postedBy: req.user.id,}
+        })
+        .then((r) => {
+          if(r === null) {
+            // insertする
+            Comment.upsert({
+          recommendId: recommendId,
+          postedBy: req.user.id,
+          comment: req.body.comment,
+          updatedAt: updatedAt,
+           commentNum = r.commentNum +1
+            })
+            else {
+              Recommendation.update({
+        commentNum: commentNum},
+        {where: {recommendId: recommendId}
+        )
+            })
+
+            }
+          }
+        })
+        */
+
         })
         .then(() => {
           res.redirect('/recommendations/' + categoryId + '/' + bookName);
@@ -65,7 +94,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
         
     }
   } else {
-    // カテゴリを新規に登録する  
+    // カテゴリを新しく登録して本をおすすめする
     Category.findOne({
       where: { categoryName: req.body.categoryName }
     }).then((c) => {
@@ -74,7 +103,8 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
         err.status = 404;
         next(err);
       }
-      else {                                          // カテゴリーを新しく登録する処理
+      else {                                          
+        // カテゴリーを新しく登録する処理
         Category.create({
           categoryName: req.body.categoryName,
           createdBy: req.user.id,
@@ -91,6 +121,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
               createdBy: req.user.id,
               updatedAt: updatedAt,
               introduction: req.body.introducion
+              // commentNew: 0
             })
               .then((r) => {
                 /*
@@ -193,7 +224,7 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
             model: Comment,
             attributes: ['comment', 'postedBy']
           }],
-        where: {                            // カテゴリ名と書籍名でレコードを検索
+        where: {                            // カテゴリIdと書籍名でレコードを検索
           categoryId: req.params.categoryId,
           bookName: req.params.key
         },
@@ -207,6 +238,7 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
 
 
             let recommendationArray = Object.values(recommendations); // オブジェクトを配列にする
+            // このあたりで配列の順番を日付の昇順にしたい
             console.log(recommendationArray);
             //        let bookComment = [];
             let bookCommentsMap = new Map();　　　　// key: postedBy , value: comment
@@ -233,7 +265,6 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
             else {
               isComment = false;
               console.log(isComment);
-              console.log('よし');
             }
             
             let rec = recommendationArray[0];  // ここがダメ　配列にしないとArrayの長さ分
@@ -252,7 +283,12 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
             //         isComment = false;
             //     }
             console.log(isComment);
-
+            console.log(req.user.id);
+            const userId = parseInt(req.user.id); // 文字列を数値に変換
+            let myComment = bookCommentsMap.get(userId);
+            if (myComment == null) {
+              myComment = "";
+            }            
 
             res.render('recommendation', {          // recommendation.pugに対し
               bookName: bName,
@@ -262,7 +298,9 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
               categoryId: cId,
               cName: cName,
               isComment: isComment,
-              bookCommentsMap: bookCommentsMap
+              bookCommentsMap: bookCommentsMap,
+              userId: userId,
+              myComment: myComment　　// promptの初期値に表示するログインユーザーのコメント
             });
 
           } else {

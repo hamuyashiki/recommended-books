@@ -28,3 +28,15 @@ block content
             tr  
               td #{key}
               td #{value}
+    tr
+      td
+        p#comment-postedBy 
+      td
+        p#self-comment
+      tr
+    button(
+      data-recommend-id=recommendId
+      data-category-id=categoryId
+      data-book-name=bookName
+      data-user-id=userId
+      data-my-comment=myComment)#self-comment-button コメントの追加/編集
