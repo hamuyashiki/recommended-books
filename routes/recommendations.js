@@ -18,7 +18,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
 
   const updatedAt = new Date();
   // const categoryId = uuid.v4();
-  if (req.body.categoryName == null) {
+  if (req.body.categoryName == null) { // 既存カテゴリに本を登録する場合categoryNameをPOSTしない
 
     // 既存カテゴリに本を登録する処理
     if (req.body.comment == null) {
@@ -27,8 +27,8 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
         categoryId: req.body.categoryId,
         createdBy: req.user.id,
         updatedAt: updatedAt,
-        introduction: req.body.introduction
-        // commentNum: 0
+        introduction: req.body.introduction,
+        commentNum: 0
       })
         .then((r) => {
           /*
@@ -41,58 +41,76 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
           */
           res.redirect('/recommendations/' + r.categoryId);
         })
-    } else { 
-       // 投稿されたコメントを保存する                          
+    } else {
+      // 投稿されたコメントを保存する(ajaxではない場合)　ここの塊は削除対象                          
       Recommendation.findOne({
         where: { recommendId: req.body.recommendId }
       })
-      // TO DO 同一の親文書に対し同一人が複数のコメントを登録できなくする
-      // UPSERTを使う(登録または更新)
-      .then((r) => {
-        const recommendId = r.recommendId;
-        const categoryId = r.categoryId;
-        const bookName = req.body.bookName;
-        Comment.upsert({
-          recommendId: recommendId,
-          postedBy: req.user.id,
-          comment: req.body.comment,
-          updatedAt: updatedAt
-
-        // TO DO  ここでRecommendationのコメント数をインクリメントする
-        /* 
-        Comment.findOne({
-          where:{ recommendId: req.body.recommendId, postedBy: req.user.id,}
-        })
+        // TO DO 同一の親文書に対し同一人が複数のコメントを登録できなくする
+        // UPSERTを使う(登録または更新)
         .then((r) => {
-          if(r === null) {
-            // insertする
-            Comment.upsert({
-          recommendId: recommendId,
-          postedBy: req.user.id,
-          comment: req.body.comment,
-          updatedAt: updatedAt,
-           commentNum = r.commentNum +1
-            })
-            else {
-              Recommendation.update({
-        commentNum: commentNum},
-        {where: {recommendId: recommendId}
-        )
-            })
 
-            }
-          }
-        })
-        */
+          
+          const recommendId = r.recommendId;
+          const categoryId = r.categoryId;
+          const bookName = req.body.bookName;
 
+          let commentNum = r.commentNum
+
+          console.log(commentNum);
+
+          /*
+          Comment.upsert({
+            recommendId: recommendId,
+            postedBy: req.user.id,
+            comment: req.body.comment,
+            updatedAt: updatedAt
+          */
+          // TO DO  ここでRecommendationのコメント数をインクリメントする
+
+          Comment.findOne({
+            where: { recommendId: recommendId, postedBy: req.user.id, }
+          })
+            .then((c) => {
+                            
+              console.log(c);
+              if (c === null) {
+                // insertする
+                console.log(commentNum + 1);
+                Recommendation.update({
+                  commentNum: commentNum + 1
+                },
+                  {
+                    where: { recommendId: recommendId }
+                  }
+                )
+              }
+              else {
+                console.log(commentNum + 1); // ここはcommentNum 
+              //  Recommendation.update({
+              //    commentNum: commentNum + 1
+              //  },
+              //    {
+              //      where: { recommendId: recommendId }
+              //    }
+              //  )
+
+              }
+              Comment.upsert({
+                recommendId: recommendId,
+                postedBy: req.user.id,
+                comment: req.body.comment,
+                updatedAt: updatedAt
+              })
+            })
+            .then(() => {
+              console.log(commentNum);
+              res.redirect('/recommendations/' + categoryId + '/' + bookName);
+            })
         })
-        .then(() => {
-          res.redirect('/recommendations/' + categoryId + '/' + bookName);
-        })
-      })
-      
-        
-    }
+
+
+    }　// ajaxを使わない場合はここまでを削除する
   } else {
     // カテゴリを新しく登録して本をおすすめする
     Category.findOne({
@@ -103,7 +121,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
         err.status = 404;
         next(err);
       }
-      else {                                          
+      else {
         // カテゴリーを新しく登録する処理
         Category.create({
           categoryName: req.body.categoryName,
@@ -120,8 +138,8 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
               categoryId: c.categoryId, // 今回新たに作ったカテゴリーのcategoryId
               createdBy: req.user.id,
               updatedAt: updatedAt,
-              introduction: req.body.introducion
-              // commentNew: 0
+              introduction: req.body.introducion,
+              commentNum: 0
             })
               .then((r) => {
                 /*
@@ -169,7 +187,8 @@ router.get('/:categoryId', authenticationEnsurer, (req, res, next) => {
           recommendationArray.forEach((r) => {
             // bookNames.push(r.bookName);
             console.log(r.bookName);
-            bookNamesMap.set(r.bookName, r.updatedAt)
+            bookNamesMap.set(r.bookName, r.commentNum)
+        //    bookNamesMap.set(r.bookName, r.updatedAt)
           });
     //      console.log(bookNames);
     //      console.log(bookNames.length);

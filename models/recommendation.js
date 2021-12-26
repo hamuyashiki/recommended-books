@@ -29,6 +29,10 @@ const Recommendation = sequelize.define(
         introduction: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        commentNum: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     },
     {
