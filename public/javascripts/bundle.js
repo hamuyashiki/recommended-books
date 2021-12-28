@@ -94,6 +94,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 
 
+ // const Recommendation = require('../models/recommendation');
+// const Comment = require('../models/comment');
 
 var buttonSelfComment = jquery__WEBPACK_IMPORTED_MODULE_0___default()('#self-comment-button');
 buttonSelfComment.click(function () {
@@ -104,7 +106,43 @@ buttonSelfComment.click(function () {
   var userId = buttonSelfComment.data('user-id');
   var myComment = buttonSelfComment.data('my-comment');
   console.log(myComment);
-  var comment = prompt('コメントを255文字以内で入力してください。', "".concat(myComment));
+  var comment = prompt('コメントを255文字以内で入力してください。', "".concat(myComment)); // ここでコメント数をインクリメントしてはダメ　コメントを保存するところでやる
+
+  /*
+  Recommendation.findOne({
+    where: { recommendId: recommendId }
+  })
+    .then((r) => {
+       const recommendId = r.recommendId;
+      const categoryId = r.categoryId;
+      const bookName = bookName;
+       let commentNum = r.commentNum
+       console.log(commentNum);
+      
+      Comment.findOne({
+        where: { recommendId: recommendId, postedBy: userId, }
+      })
+        .then((c) => {
+           console.log(c);
+          // 当該本へのコメントが初のユーザーがコメントした場合にRecommendationのコメント数をインクリメントする
+          if (c === null) {
+            console.log(commentNum + 1);
+            Recommendation.update({
+              commentNum: commentNum + 1
+            },
+              {
+                where: { recommendId: recommendId }
+              }
+            )
+          }
+          else {
+            console.log(commentNum + 1); // ここはcommentNum 
+          }
+        })
+        
+    })
+    */
+  // ここまで
 
   if (comment) {
     jquery__WEBPACK_IMPORTED_MODULE_0___default.a.post("/recommendations/".concat(categoryId, "/").concat(bookName, "/comments"), {

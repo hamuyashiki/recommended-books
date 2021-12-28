@@ -48,9 +48,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
       })
         // TO DO 同一の親文書に対し同一人が複数のコメントを登録できなくする
         // UPSERTを使う(登録または更新)
-        .then((r) => {
-
-          
+        .then((r) => {          
           const recommendId = r.recommendId;
           const categoryId = r.categoryId;
           const bookName = req.body.bookName;
@@ -66,13 +64,12 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
             comment: req.body.comment,
             updatedAt: updatedAt
           */
-          // TO DO  ここでRecommendationのコメント数をインクリメントする
+          // TO DO  ここでRecommendationのコメント数をインクリメントする　　削除する
 
           Comment.findOne({
             where: { recommendId: recommendId, postedBy: req.user.id, }
           })
-            .then((c) => {
-                            
+            .then((c) => {         
               console.log(c);
               if (c === null) {
                 // insertする

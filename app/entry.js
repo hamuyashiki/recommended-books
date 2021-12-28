@@ -1,8 +1,8 @@
 'use strict';
 import $ from 'jquery';
 
-const Recommendation = require('../models/recommendation');
-const Comment = require('../models/comment');
+// const Recommendation = require('../models/recommendation');
+// const Comment = require('../models/comment');
 
 const buttonSelfComment = $('#self-comment-button');
 buttonSelfComment.click(() => {
@@ -15,12 +15,11 @@ buttonSelfComment.click(() => {
   console.log(myComment);
   const comment = prompt('コメントを255文字以内で入力してください。', `${myComment}`);
   
-  // ここから
+  // ここでコメント数をインクリメントしてはダメ　コメントを保存するところでやる
+  /*
   Recommendation.findOne({
     where: { recommendId: recommendId }
   })
-    // TO DO 同一の親文書に対し同一人が複数のコメントを登録できなくする
-    // UPSERTを使う(登録または更新)
     .then((r) => {
 
       const recommendId = r.recommendId;
@@ -31,16 +30,14 @@ buttonSelfComment.click(() => {
 
       console.log(commentNum);
       
-      // ここでRecommendationのコメント数をインクリメントする
-
       Comment.findOne({
         where: { recommendId: recommendId, postedBy: userId, }
       })
         .then((c) => {
 
           console.log(c);
+          // 当該本へのコメントが初のユーザーがコメントした場合にRecommendationのコメント数をインクリメントする
           if (c === null) {
-            // insertする
             console.log(commentNum + 1);
             Recommendation.update({
               commentNum: commentNum + 1
@@ -54,7 +51,9 @@ buttonSelfComment.click(() => {
             console.log(commentNum + 1); // ここはcommentNum 
           }
         })
+        
     })
+    */
 
     // ここまで
 
