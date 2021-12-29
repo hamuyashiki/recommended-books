@@ -1,6 +1,8 @@
 extends layout
 
 block content
+  div
+      a(href=`/recommendations/${categoryId}`)  書籍一覧に戻る
   form(method="post", action="/recommendations")
     div
       h5 カテゴリ名: #{cName}
