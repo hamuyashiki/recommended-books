@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h3.my-3 書籍の情報を編集する
+  div
+      a(href=`/recommendations/${categoryId}`).btn.btn-info.my-3 書籍一覧に戻る
+  form(method="post", action="/recommendations")
+    div.form-group
+      h5 カテゴリ名: #{categoryName}
+      input(type="hidden" name="categoryId" value=categoryId)
+      input(type="hidden" name="recommendId" value=recommendId)     
+    div.form-group
+      h5 書籍名
+      input(type="text" name="bookName" value=`${bookName}` required )#bookName.form-control
+    div.form-group
+      h5 おすすめのポイント
+      textarea(name="introduction" required )#introduction.form-control #{introduction}
+    button(type="submit").btn.btn-danger 反映

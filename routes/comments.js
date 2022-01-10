@@ -24,18 +24,14 @@ router.post('/:categoryId/:bookName/comments', authenticationEnsurer,
         const categoryId = r.categoryId;
         const bookName = req.body.bookName;
 
-        let commentNum = r.commentNum
-
-        console.log(commentNum);
+        let commentNum = r.commentNum;
 
         Comment.findOne({
           where: { recommendId: rId, postedBy: req.user.id, }
         })
           .then((c) => {
-            console.log(c);
-            // 当該本に対してのコメントが初めてのユーザーのときはコメント数をインクリメントする
+            // 当該書籍に対してのコメントが初めてのユーザーのときはコメント数をインクリメントする
             if (c === null) {
-              console.log(commentNum + 1);
               Recommendation.update({
                 commentNum: commentNum + 1
               },
@@ -44,15 +40,13 @@ router.post('/:categoryId/:bookName/comments', authenticationEnsurer,
                 }
               )
             }
-            // 当該本に対してのコメントが２度目以上のユーザーのときはコメント数を変えない
+            // 当該書籍に対してのコメントの修正のときはコメント数を変えない
             else {
             }
-
-            const recommendId = req.body.recommendId;  // ここがダメ
-            console.log(recommendId);
+            // コメントをUPSERTする
+            const recommendId = req.body.recommendId;
             const categoryId = req.params.categoryId;
             const bookName = req.params.bookName;
-
             const comment = req.body.comment;
 
             Comment.upsert({

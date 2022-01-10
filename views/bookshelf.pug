@@ -3,21 +3,22 @@ extends layout
 block content
     div
       h5 カテゴリ名: #{cName}
-      a(href=`/`)  TOPに戻る
+      a(href=`/`).btn.btn-info.my-3 カテゴリ一覧に戻る
       div
-      a(href=`/recommendations/${categoryId}/book`)  別の書籍を投稿する
+        table
+          tr
+            th
+              a(href=`/recommendations/${categoryId}/book`).btn.btn-success.my-3 書籍を追加する
       input(type="hidden" name="categoryId" value=categoryId)    
       div
         - var hasbook = bookNamesMap.size > 0
       if hasbook
         h3 書籍一覧
-        table.table
+        table.table.table-bordered
           tr
             th 書籍名
-                th 更新日時
-                  th コメント数
-            - for (var key of bookNamesMap.keys())
-          
+                th コメント数
+            - for (var key of bookNamesMap.keys())          
                 tr
                 td
                     a(href=`/recommendations/${categoryId}/${key}`) #{key}

@@ -1,18 +1,16 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  div
+  div.jumbotron.my-3
+    h1.display-4 おすすめBookくん
+    p.lead おすすめBookくんは、GitHubで認証できるプログラミングに関する書籍の情報交換サービスです
     if user
       div
-        a(href="/logout") #{user.username} をログアウト
-      div
-        a(href="/recommendations/new") カテゴリを新しく登録して本をおすすめする
+        a(href="/recommendations/new").btn.btn-success 新規カテゴリで本を登録する
         - var hascategory = categories.length > 0
       if hascategory
-        h3 カテゴリー一覧
-        table.table
+        h3.my-3 カテゴリー一覧
+        table.table.table-bordered
           tr
             th カテゴリー名
             th 作成日時
@@ -21,6 +19,3 @@ block content
               td
                 a(href=`/recommendations/${category.categoryId}`) #{category.categoryName}
               td #{category.updatedAt}
-    else
-      div
-        a(href="/login") ログイン

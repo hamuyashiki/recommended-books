@@ -73,6 +73,7 @@ var loginRouter = require('./routes/login');
 var logoutRouter = require('./routes/logout');
 var recommendationsRouter = require('./routes/recommendations');
 var commentsRouter = require('./routes/comments');
+var bookeditRouter = require('./routes/bookedit');
 
 var app = express();
 app.use(helmet());
@@ -95,10 +96,11 @@ app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/recommendations', recommendationsRouter);
-app.use('/recommendations/categoryId/book', recommendationsRouter); // 多分不要
-app.use('/recommendations/categoryId/bookshelf', recommendationsRouter); // 多分不要
-app.use('/recommendations/categoryId/recommendId/comment', recommendationsRouter); // 多分不要
-app.use('/recommendations', commentsRouter);  // 追加したが上手く行かない
+//app.use('/recommendations/categoryId/book', recommendationsRouter); // 多分不要
+//app.use('/recommendations/categoryId/bookshelf', recommendationsRouter); // 多分不要
+//app.use('/recommendations/categoryId/recommendId/comment', recommendationsRouter); // 多分不要
+app.use('/recommendations', commentsRouter);
+app.use('/recommendations', bookeditRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),

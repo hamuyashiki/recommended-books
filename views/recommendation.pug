@@ -2,41 +2,52 @@ extends layout
 
 block content
   h3 カテゴリー：#{cName}
-  
-  p 作成者: #{cCreatedBy}
-
-  div
-      a(href=`/`)  TOPに戻る
-      div
-        a(href=`/recommendations/${categoryId}`) 書籍一覧に戻る
-
   table
     tr
-      th おすすめの書籍
-        th #{bookName}
-          th 
-            a(href=`/recommendations/${categoryId}/${recommendId}/comment`) コメントを追加する
+      th
+        a(href=`/`).btn.btn-info.my-3 カテゴリ一覧に戻る
+        th
+          a(href=`/recommendations/${categoryId}`).btn.btn-info.my-3 書籍一覧に戻る
+  table.table.table-bordered
     tr
-      th 書評
-        th #{introduction}
+      th 書籍名
+        td #{bookName}            
+    tr
+      th おすすめのポイント
+        td #{introduction}
+    tr
+      th 投稿者： #{rcreatedBy}
+        td
+          if (parseInt(userId) === parseInt(rcreatedBy))
+            a(href=`/recommendations/${categoryId}/${cName}/${recommendId}/${bookName}/edit`).btn.btn-success.my-1 編集
+
+  div
+    table
+      tr
+        th
+          button(
+              data-recommend-id=recommendId
+              data-category-id=categoryId
+              data-book-name=bookName
+              data-user-id=userId
+              data-my-comment=myComment)#self-comment-button.btn.btn-success コメントの追加/編集
+          
+    table.table.table-bordered
+      tr
+        th
+          p#comment-postedBy
+        th
+          p#self-comment 
+    th          
+          a(href=`/recommendations/${categoryId}/${recommendId}/${bookName}/delete`).btn.btn-danger 自分のコメントを削除 
+    table.table.table-bordered
+      th 投稿者
+      th コメント
         - for (var key of bookCommentsMap.keys())
           tr
             - var value = bookCommentsMap.get(key)
           if (isComment)
-            th 投稿者
-            th コメント
+            
             tr  
               td #{key}
-              td #{value}
-    tr
-      td
-        p#comment-postedBy 
-      td
-        p#self-comment
-      tr
-    button(
-      data-recommend-id=recommendId
-      data-category-id=categoryId
-      data-book-name=bookName
-      data-user-id=userId
-      data-my-comment=myComment)#self-comment-button コメントの追加/編集
+              td #{value}      

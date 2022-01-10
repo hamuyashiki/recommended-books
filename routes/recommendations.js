@@ -14,14 +14,50 @@ router.get('/new', authenticationEnsurer, (req, res, next) => {
   res.render('new', { user: req.user });
 });
 
-router.post('/', authenticationEnsurer, (req, res, next) => {
+router.get('/:categoryId/:cName/:recommendId/:bookName/edit', authenticationEnsurer, (req, res, next) => {
+  Recommendation.findOne({
+    where: {
+      recommendId: req.params.recommendId,
+      createdBy: req.user.id
+    }
+  }).then((r) => {
+      const introduction = r.introduction;
+      let commentNum = r.commentNum;　　// 不要
+          
+      res.render('bookedit', {
+        categoryId: req.params.categoryId,
+        categoryName: req.params.cName,
+        recommendId: req.params.recommendId,        
+        bookName: req.params.bookName,
+        introduction: introduction
+      });
+    })
+})
 
+router.post('/:recommendId/:bookName/delete', authenticationEnsurer, (req, res, next) => {
+  Comment.findOne({
+    where: {
+      recommendId: req.params.recommendId,
+      postedBy: req.user.id
+    }
+  }).then((comment) => {
+      if (parseInt(req.query.delete) === 1) {
+        return Promise.all(comments.map((c) => { return c.destroy(); }));
+    };
+  })
+})
+
+router.post('/', authenticationEnsurer, (req, res, next) => {
   const updatedAt = new Date();
   // const categoryId = uuid.v4();
-  if (req.body.categoryName == null) { // 既存カテゴリに本を登録する場合categoryNameをPOSTしない
+  if (req.body.categoryName == null) { // 既存カテゴリに本を登録する場合categoryNameをPOSTしないのでこの条件
 
+    // ここにはupdateを混ぜられない
+    // recommendIdが自動付与だから　すでに存在する　
+    // recommdendIdがあるかどうかで切り分け可能か
+　　　if (req.body.recommendId == null) {
     // 既存カテゴリに本を登録する処理
-    if (req.body.comment == null) {
+  //  if (req.body.comment == null) {
       Recommendation.create({
         bookName: req.body.bookName,
         categoryId: req.body.categoryId,
@@ -31,17 +67,10 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
         commentNum: 0
       })
         .then((r) => {
-          /*
-          Comment.create({
-            recommendId: r.recommendId,
-            createdBy: req.user.id,
-            comment: req.body.comment,
-            updatedAt: updatedAt
-          })
-          */
           res.redirect('/recommendations/' + r.categoryId);
         })
-    } else {
+  //  }
+    /* else {
       // 投稿されたコメントを保存する(ajaxではない場合)　ここの塊は削除対象                          
       Recommendation.findOne({
         where: { recommendId: req.body.recommendId }
@@ -57,13 +86,6 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
 
           console.log(commentNum);
 
-          /*
-          Comment.upsert({
-            recommendId: recommendId,
-            postedBy: req.user.id,
-            comment: req.body.comment,
-            updatedAt: updatedAt
-          */
           // TO DO  ここでRecommendationのコメント数をインクリメントする　　削除する
 
           Comment.findOne({
@@ -84,14 +106,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
               }
               else {
                 console.log(commentNum + 1); // ここはcommentNum 
-              //  Recommendation.update({
-              //    commentNum: commentNum + 1
-              //  },
-              //    {
-              //      where: { recommendId: recommendId }
-              //    }
-              //  )
-
+              
               }
               Comment.upsert({
                 recommendId: recommendId,
@@ -108,6 +123,22 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
 
 
     }　// ajaxを使わない場合はここまでを削除する
+    */
+        } else{
+          const introduction = req.body.introduction.slice(0, 255);
+          const recommendId = parseInt(req.body.recommendId);
+          Recommendation.update({
+              bookName: req.body.bookName,
+              updatedAt: updatedAt,
+              introduction: introduction
+          },
+              {
+                  where: { recommendId: recommendId }
+              }
+          )
+        res.redirect(`/recommendations/${req.body.categoryId}/${req.body.bookName}`)
+      }
+    
   } else {
     // カテゴリを新しく登録して本をおすすめする
     Category.findOne({
@@ -139,14 +170,6 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
               commentNum: 0
             })
               .then((r) => {
-                /*
-                Comment.create({
-                  recommendId: r.recommendId,
-                  createdBy: req.user.id,
-                  comment: req.body.comment,
-                  updatedAt: updatedAt
-                })
-                */
                 res.redirect('/recommendations/' + r.categoryId);
               })
           });
@@ -156,16 +179,14 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
 });
 
 router.get('/:categoryId', authenticationEnsurer, (req, res, next) => {
-  // TO DO 選択されたカテゴリの本の一覧を表示する
+  // 選択されたカテゴリの本の一覧を表示する
   Category.findOne({
     where: { categoryId: req.params.categoryId }
   })
     .then((category) => {
-      // TO DO userNameを表示させるならば　User.findOne する
       const cName = category.categoryName; // recommendation.pugに渡す"カテゴリ名"
       const cId = category.categoryId;
       const cCreatedBy = category.createdBy; // カテゴリを作った人の名前    
-      console.log(cName);  // ここまでok 
 
       Recommendation.findAll({
         where: {
@@ -173,33 +194,18 @@ router.get('/:categoryId', authenticationEnsurer, (req, res, next) => {
         },
         order: [['updatedAt', 'DESC']]
       })
-        // TO DO 選択されたカテゴリの本の一覧の配列を作成する
+        // 選択されたカテゴリの本の一覧の配列を作成する
         .then((recommendations) => {
-          console.log(recommendations);
           let recommendationArray = Object.values(recommendations);
-          console.log(recommendationArray);
-
           let bookNamesMap = new Map();
-          // let bookNames = [];    // もし、本の登録日も表示させるならばここをmapにする
           recommendationArray.forEach((r) => {
-            // bookNames.push(r.bookName);
-            console.log(r.bookName);
             bookNamesMap.set(r.bookName, r.commentNum)
-        //    bookNamesMap.set(r.bookName, r.updatedAt)
-          });
-    //      console.log(bookNames);
-    //      console.log(bookNames.length);
-            console.log(bookNamesMap);
-            console.log(bookNamesMap.size);
-        
-      
-      res.render('bookshelf', {          // recommendation.pugに対し
-      //  bookNames: bookNames,
+          });      
+      res.render('bookshelf', {
         categoryId: cId,
         cName: cName,
         cCreatedBy: cCreatedBy,
         bookNamesMap: bookNamesMap
-
       });
     })
     })
@@ -219,6 +225,10 @@ router.get('/:categoryId/book', authenticationEnsurer, (req, res, next) => {
         cName: cName
       });
     });
+});
+
+// 書籍の編集画面への遷移
+router.get('/:categoryId/bookEdit', authenticationEnsurer, (req, res, next) => {
 
 });
 
@@ -229,10 +239,8 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
     where: { categoryId: req.params.categoryId }
   })
     .then((category) => {
-      // TO DO userNameを表示させるならば　User.findOne する
       const cName = category.categoryName;　　// recommendation.pugに渡す"カテゴリ名"
-      const cId = category.categoryId;
-      console.log(cName);  // ここまでok     
+      const cId = category.categoryId;  
 
       Recommendation.findAll({
         include: [
@@ -248,58 +256,34 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
       })
 
         .then((recommendations) => {　// 選択された書籍に対するコメント違いのレコード群
-
           if (recommendations) {
-            console.log(recommendations);
-
-
+                     
             let recommendationArray = Object.values(recommendations); // オブジェクトを配列にする
-            // このあたりで配列の順番を日付の昇順にしたい
-            console.log(recommendationArray);
-            //        let bookComment = [];
+
+            const rcreatedBy = recommendationArray[0].createdBy;
+            
             let bookCommentsMap = new Map();　　　　// key: postedBy , value: comment
             recommendationArray.forEach((r) => {　　// 配列の繰り返し処理
-              //       bookComment.push(r.comment);
               const rc = r.comment;
-              console.log(rc);
               
-     //         if (Object.keys(rc).length === null) {
               if ( rc === null) {  
               }
               else {
-                console.log(rc.postedBy);
-                console.log(rc.comment)
-
-                bookCommentsMap.set(rc.postedBy, rc.comment); // Mapオブジェクトに値を入れる
-                console.log(bookCommentsMap);  
+                bookCommentsMap.set(rc.postedBy, rc.comment); // Mapオブジェクトに値を入れる 
               }              
             });
             if (bookCommentsMap.size > 0) {
               var isComment = true;
-              console.log(isComment);
             }
             else {
               isComment = false;
-              console.log(isComment);
             }
             
-            let rec = recommendationArray[0];  // ここがダメ　配列にしないとArrayの長さ分
-            // 表示側はappendchildみたいな　each in でやる
-            // どういう構造のデータを作りたいか考えてから実装する
-            console.log(rec);
+            let rec = recommendationArray[0];
             let bName = rec.bookName;
             let rId = rec.recommendId;
             let intro = rec.introduction;
-            console.log(bName);
             let comments = rec.comment;
-            //    let comments = bookComment; // ここダメ
-            console.log(comments);
-            //     var isComment = true;
-            //     if (comments === null) {
-            //         isComment = false;
-            //     }
-            console.log(isComment);
-            console.log(req.user.id);
             const userId = parseInt(req.user.id); // 文字列を数値に変換
             let myComment = bookCommentsMap.get(userId);
             if (myComment == null) {
@@ -309,6 +293,7 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
             res.render('recommendation', {          // recommendation.pugに対し
               bookName: bName,
               recommendId: rId,
+              rcreatedBy: rcreatedBy,
               introduction: intro,
               recommendations: recommendationArray,
               categoryId: cId,
@@ -324,11 +309,8 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
             err.status = 404;
             next(err);
           }
-
-
         })
 });
-
   
 // コメント入力画面へのルーター
   router.get('/:categoryId/:recommendId/comment', authenticationEnsurer, (req, res, next) => {
@@ -373,7 +355,68 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
     
   });
   */
-});
 
+ 
+  function isMine(req, comment) {
+    return comment && parseInt(comment.postedBy) === parseInt(req.user.id);
+  }
+// コメントを削除する処理（自分のコメントがあったら削除できる。コメント数を一つ減らす。）
+  router.get('/:categoryId/:recommendId/:bookName/delete', authenticationEnsurer, (req, res, next) => {
+      Comment.findOne({
+        where: {
+          recommendId: req.params.recommendId,
+          postedBy: req.user.id
+        }
+      })
+      .then(
+        (c) => {
+          const isM1 = isMine(req, c);
+          if (isM1) { return c.destroy(); } // 自分のコメントがあったら削除
+        }
+      )
+    Recommendation.findAll({
+      include: [
+        {
+          model: Comment,
+          attributes: ['comment', 'postedBy']
+        }],
+      where: { recommendId: req.params.recommendId }
+    }).then((rs) => {
+      let commentsArray = Object.values(rs); // オブジェクトを配列にする
+      let commentsMap = new Map();　　　　// key: postedBy , value: commentNum
+      commentsArray.forEach((c) => {　　// 配列の繰り返し処理
+        const cc = c.comment;
+        const cn = c.commentNum;
+        if (cc === null) {
+        }
+        else {
+          commentsMap.set(cc.postedBy, cn); // Mapオブジェクトに値を入れる
+        }
+      });
+      const id = parseInt(req.user.id);
+      const isM2 = commentsMap.has(id);
+      // 自分のコメントがあったらコメント数をデクリメントする
+      if (isM2) {
+        const cNum = commentsMap.get(id);
+        
+        Recommendation.update({
+          commentNum: cNum - 1
+        },
+          {
+            where: { recommendId: req.params.recommendId }
+          }
+        )
+        res.redirect(`/recommendations/${req.params.categoryId}/${req.params.bookName}`)
+      }
+      else {
+        const err = new Error('自分のコメントがないか、削除する権限がありません。');
+        err.status = 404;
+        next(err);
+      }
+      
+    }
+    )
+  });
+});
 
 module.exports = router;

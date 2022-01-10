@@ -6,7 +6,7 @@ const Category = require('../models/category');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  const title = 'おすすめbookくん';
+  const title = 'おすすめBookくん';
   if (req.user) {
     Category.findAll({
     }).then(categories => {
