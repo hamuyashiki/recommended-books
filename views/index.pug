@@ -9,13 +9,13 @@ block content
         a(href="/recommendations/new").btn.btn-success 新規カテゴリで本を登録する
         - var hascategory = categories.length > 0
       if hascategory
-        h3.my-3 カテゴリー一覧
+        h3.my-3 カテゴリ一覧
         table.table.table-bordered
           tr
-            th カテゴリー名
+            th カテゴリ名
             th 作成日時
           each category in categories
             tr
               td
                 a(href=`/recommendations/${category.categoryId}`) #{category.categoryName}
-              td #{category.updatedAt}
+              td #{category.formattedUpdatedAt}

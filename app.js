@@ -12,18 +12,6 @@ var User = require('./models/user');
 var Recommendation = require('./models/recommendation');
 var Category = require('./models/category');
 var Comment = require('./models/comment');
-/*
-User.sync().then(() => {
-  Comment.belongsTo(User, {foreignKey: 'userId'});
-  Comment.sync();
-  Category.belongsTo(User, {foreignKey: 'createdBy'});
-  Recommendation.belongsTo(User, {foreignKey: 'createdBy'});
-  Category.sync().then(() => {
-    Recommendation.belongsTo(Category, {foreignKey: 'categoryId'});
-    Recommendation.sync();  
-  });
-});
-*/
 
 User.sync().then(() => {
   Comment.belongsTo(User, {foreignKey: 'postedBy'});
@@ -67,7 +55,6 @@ passport.use(new GitHubStrategy({
   }
 ));
 
-
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
 var logoutRouter = require('./routes/logout');
@@ -96,9 +83,6 @@ app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/recommendations', recommendationsRouter);
-//app.use('/recommendations/categoryId/book', recommendationsRouter); // 多分不要
-//app.use('/recommendations/categoryId/bookshelf', recommendationsRouter); // 多分不要
-//app.use('/recommendations/categoryId/recommendId/comment', recommendationsRouter); // 多分不要
 app.use('/recommendations', commentsRouter);
 app.use('/recommendations', bookeditRouter);
 

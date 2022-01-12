@@ -30,7 +30,7 @@ block content
               data-category-id=categoryId
               data-book-name=bookName
               data-user-id=userId
-              data-my-comment=myComment)#self-comment-button.btn.btn-success コメントの追加/編集
+              data-my-comment=myComment)#self-comment-button.btn.btn-success コメントの追加と編集
           
     table.table.table-bordered
       tr
@@ -39,7 +39,7 @@ block content
         th
           p#self-comment 
     th          
-          a(href=`/recommendations/${categoryId}/${recommendId}/${bookName}/delete`).btn.btn-danger 自分のコメントを削除 
+          a(href=`/recommendations/${categoryId}/${recommendId}/${bookName}/delete`).btn.btn-danger 自分のコメントの削除 
     table.table.table-bordered
       th 投稿者
       th コメント

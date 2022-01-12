@@ -16,8 +16,6 @@ router.post('/:categoryId/:bookName/comments', authenticationEnsurer,
     Recommendation.findOne({
       where: { recommendId: req.body.recommendId }
     })
-      // TO DO 同一の親文書に対し同一人が複数のコメントを登録できなくする
-      // UPSERTを使う(登録または更新)
       .then((r) => {
 
         const rId = r.recommendId;
