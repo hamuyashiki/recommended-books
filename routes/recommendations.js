@@ -11,7 +11,11 @@ const { xssFilter } = require('helmet');
 const { COMMENT_KEYS } = require('@babel/types');
 
 router.get('/new', authenticationEnsurer, (req, res, next) => {
-  res.render('new', { user: req.user });
+  const buttonFlag1 = 1; // bootstrap navbar にボタンを表示させる条件だけに使う
+  res.render('new', {
+    user: req.user,
+    buttonFlag1: buttonFlag1 
+  });
 });
 
 router.get('/:categoryId/:cName/:recommendId/:bookName/edit', authenticationEnsurer, (req, res, next) => {
@@ -22,13 +26,18 @@ router.get('/:categoryId/:cName/:recommendId/:bookName/edit', authenticationEnsu
     }
   }).then((r) => {
     const introduction = r.introduction;
+    const buttonFlag1 = 1; // bootstrap navbar にボタンを表示させる条件だけに使う
+    const buttonFlag2 = 1; // bootstrap navbar にボタンを表示させる条件だけに使う
 
     res.render('bookedit', {
+      user: req.user,
       categoryId: req.params.categoryId,
       categoryName: req.params.cName,
       recommendId: req.params.recommendId,
       bookName: req.params.bookName,
-      introduction: introduction
+      introduction: introduction,
+      buttonFlag1: buttonFlag1,
+      buttonFlag2: buttonFlag2
     });
   })
 })
@@ -142,11 +151,15 @@ router.get('/:categoryId', authenticationEnsurer, (req, res, next) => {
           recommendationArray.forEach((r) => {
             bookNamesMap.set(r.bookName, r.commentNum)
           });
+          const buttonFlag1 = 1;
+
           res.render('bookshelf', {
+            user: req.user,
             categoryId: cId,
             cName: cName,
             cCreatedBy: cCreatedBy,
-            bookNamesMap: bookNamesMap
+            bookNamesMap: bookNamesMap,
+            buttonFlag1: buttonFlag1
           });
         })
     })
@@ -160,10 +173,15 @@ router.get('/:categoryId/book', authenticationEnsurer, (req, res, next) => {
     .then((category) => {
 
       const cName = category.categoryName;
+      const buttonFlag1 = 1; // bootstrap navbar にボタンを表示させる条件だけに使う
+      const buttonFlag2 = 1; // bootstrap navbar にボタンを表示させる条件だけに使う
+      
       res.render('book', {
         user: req.user,
         categoryId: req.params.categoryId,
-        cName: cName
+        cName: cName,
+        buttonFlag1: buttonFlag1,
+        buttonFlag2: buttonFlag2
       });
     });
 });
@@ -219,14 +237,16 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
             let bName = rec.bookName;
             let rId = rec.recommendId;
             let intro = rec.introduction;
-            let comments = rec.comment;
             const userId = parseInt(req.user.id); // 文字列を数値に変換
             let myComment = bookCommentsMap.get(userId);
             if (myComment == null) {
               myComment = "";
             }
+            const buttonFlag1 = 1; // bootstrap navbar にボタンを表示させる条件だけに使う
+            const buttonFlag2 = 1; // bootstrap navbar にボタンを表示させる条件だけに使う
 
             res.render('recommendation', {          // recommendation.pugに対し
+              user: req.user,
               bookName: bName,
               recommendId: rId,
               rcreatedBy: rcreatedBy,
@@ -237,7 +257,9 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
               isComment: isComment,
               bookCommentsMap: bookCommentsMap,
               userId: userId,
-              myComment: myComment　　// promptの初期値に表示するログインユーザーのコメント
+              myComment: myComment,　　// promptの初期値に表示するログインユーザーのコメント
+              buttonFlag1: buttonFlag1,
+              buttonFlag2: buttonFlag2
             });
 
           } else {
@@ -247,28 +269,6 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
           }
         })
     });
-
-  // コメント入力画面へのルーター
-  router.get('/:categoryId/:recommendId/comment', authenticationEnsurer, (req, res, next) => {
-    Category.findOne({
-      where: { categoryId: req.params.categoryId }
-    })
-      .then((category) => {
-        const categoryName = category.categoryName;
-
-        Recommendation.findOne({
-          where: { recommendId: req.params.recommendId }
-        })
-          .then((recommendation) => {
-            res.render('comment', {
-              categoryName: categoryName,
-              recommendation: recommendation,
-              categoryId: req.params.categoryId  // comment.pug でpostするために必要
-
-            });
-          });
-      });
-  });
 
   function isMine(req, comment) {
     return comment && parseInt(comment.postedBy) === parseInt(req.user.id);

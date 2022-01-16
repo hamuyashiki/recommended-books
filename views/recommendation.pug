@@ -1,13 +1,7 @@
 extends layout
 
 block content
-  h3 カテゴリー：#{cName}
-  table
-    tr
-      th
-        a(href=`/`).btn.btn-info.my-3 カテゴリ一覧に戻る
-        th
-          a(href=`/recommendations/${categoryId}`).btn.btn-info.my-3 書籍一覧に戻る
+  h3 カテゴリー：#{cName}      
   table.table.table-bordered
     tr
       th 書籍名
@@ -19,7 +13,7 @@ block content
       th 投稿者： #{rcreatedBy}
         td
           if (parseInt(userId) === parseInt(rcreatedBy))
-            a(href=`/recommendations/${categoryId}/${cName}/${recommendId}/${bookName}/edit`).btn.btn-success.my-1 編集
+            a(href=`/recommendations/${categoryId}/${cName}/${recommendId}/${bookName}/edit`).btn.btn-info 編集
 
   div
     table
@@ -30,7 +24,7 @@ block content
               data-category-id=categoryId
               data-book-name=bookName
               data-user-id=userId
-              data-my-comment=myComment)#self-comment-button.btn.btn-success コメントの追加と編集
+              data-my-comment=myComment)#self-comment-button.btn.btn-success.my-1 コメントの追加と編集
           
     table.table.table-bordered
       tr
@@ -39,7 +33,7 @@ block content
         th
           p#self-comment 
     th          
-          a(href=`/recommendations/${categoryId}/${recommendId}/${bookName}/delete`).btn.btn-danger 自分のコメントの削除 
+          a(href=`/recommendations/${categoryId}/${recommendId}/${bookName}/delete`).btn.btn-danger.my-1 自分のコメントの削除 
     table.table.table-bordered
       th 投稿者
       th コメント

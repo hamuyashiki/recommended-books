@@ -2,8 +2,6 @@ extends layout
 
 block content
   h3.my-3 書籍の情報を編集する
-  div
-      a(href=`/recommendations/${categoryId}`).btn.btn-info.my-3 書籍一覧に戻る
   form(method="post", action="/recommendations")
     div.form-group
       h5 カテゴリ名: #{categoryName}

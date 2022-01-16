@@ -12,6 +12,10 @@ html
     nav.navbar.navbar-light.bg-light
       div.navbar-header
         a(href="/").navbar-brand.nav-link おすすめBookくん
+        if buttonFlag1
+          a(href=`/`).btn.btn-dark.mx-2 カテゴリ一覧
+        if buttonFlag2
+          a(href=`/recommendations/${categoryId}`).btn.btn-dark 書籍一覧
       ul.navbar-nav
         if user
           li.nav-item

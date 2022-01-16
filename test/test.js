@@ -52,7 +52,7 @@ describe('/recommendations', () => {
         .send({
           categoryName: 'テストカテゴリ1',
           bookName: 'テスト書籍名1',
-          comment: 'テストコメント1\r\nテストコメント2\r\nテストコメント3'
+          introduction: 'テストコメント1\r\nテストコメント2\r\nテストコメント3'
         })
         .expect('Location', /recommendations/)
         .expect(302)
@@ -72,7 +72,7 @@ describe('/recommendations', () => {
               if (err) return done(err);
               // テストで作成したデータを削除
               const categoryId = createdRecommendationPath.split('/recommendations/')[1];
-              Comment.findAll({
+              Category.findAll({
                 where: { categoryId: categoryId }
               }).then(categories => {
                 const promises = categories.map(c => {
