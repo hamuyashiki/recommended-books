@@ -4,10 +4,7 @@ const express = require('express');
 const router = express.Router();
 const authenticationEnsurer = require('./authentication-ensurer');
 const Comment = require('../models/comment');
-
 const Recommendation = require('../models/recommendation');
-
-
 const updatedAt = new Date();
 
 router.post('/:categoryId/:bookName/comments', authenticationEnsurer,

@@ -3,6 +3,7 @@ extends layout
 block content
   h3.my-3 書籍の情報を編集する
   form(method="post", action="/recommendations")
+    input(type="hidden" name="_csrf" value!=csrfToken)
     div.form-group
       h5 カテゴリ名: #{categoryName}
       input(type="hidden" name="categoryId" value=categoryId)

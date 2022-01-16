@@ -10,7 +10,6 @@ buttonSelfComment.click(() => {
   const bookName = buttonSelfComment.data('book-name');
   const userId = buttonSelfComment.data('user-id');
   const myComment = buttonSelfComment.data('my-comment');
-  console.log(myComment);
   const comment = prompt('コメントを255文字以内で入力してください。', `${myComment}`);
   
   if (comment) {    

@@ -10,15 +10,19 @@ const User = require('../models/user');
 const { xssFilter } = require('helmet');
 const { COMMENT_KEYS } = require('@babel/types');
 
-router.get('/new', authenticationEnsurer, (req, res, next) => {
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+
+router.get('/new', authenticationEnsurer, csrfProtection, (req, res, next) => {
   const buttonFlag1 = 1; // bootstrap navbar にボタンを表示させる条件だけに使う
   res.render('new', {
     user: req.user,
-    buttonFlag1: buttonFlag1 
+    buttonFlag1: buttonFlag1,
+    csrfToken: req.csrfToken() 
   });
 });
 
-router.get('/:categoryId/:cName/:recommendId/:bookName/edit', authenticationEnsurer, (req, res, next) => {
+router.get('/:categoryId/:cName/:recommendId/:bookName/edit', authenticationEnsurer, csrfProtection, (req, res, next) => {
   Recommendation.findOne({
     where: {
       recommendId: req.params.recommendId,
@@ -37,12 +41,13 @@ router.get('/:categoryId/:cName/:recommendId/:bookName/edit', authenticationEnsu
       bookName: req.params.bookName,
       introduction: introduction,
       buttonFlag1: buttonFlag1,
-      buttonFlag2: buttonFlag2
+      buttonFlag2: buttonFlag2,
+      csrfToken: req.csrfToken()
     });
   })
 })
 
-router.post('/:recommendId/:bookName/delete', authenticationEnsurer, (req, res, next) => {
+router.post('/:recommendId/:bookName/delete', authenticationEnsurer, csrfProtection, (req, res, next) => {
   Comment.findOne({
     where: {
       recommendId: req.params.recommendId,
@@ -55,7 +60,7 @@ router.post('/:recommendId/:bookName/delete', authenticationEnsurer, (req, res, 
   })
 })
 
-router.post('/', authenticationEnsurer, (req, res, next) => {
+router.post('/', authenticationEnsurer, csrfProtection, (req, res, next) => {
   const updatedAt = new Date();
   // 既存カテゴリに本を登録する場合と新規カテゴリで本を登録する場合の切り分け
   if (req.body.categoryName == null) {    // categoryNameをpostしていない場合は　既存カテゴリ
@@ -166,7 +171,7 @@ router.get('/:categoryId', authenticationEnsurer, (req, res, next) => {
 });
 
 // 書籍を登録する画面への遷移
-router.get('/:categoryId/book', authenticationEnsurer, (req, res, next) => {
+router.get('/:categoryId/book', authenticationEnsurer, csrfProtection, (req, res, next) => {
   Category.findOne({
     where: { categoryId: req.params.categoryId }
   })
@@ -181,13 +186,14 @@ router.get('/:categoryId/book', authenticationEnsurer, (req, res, next) => {
         categoryId: req.params.categoryId,
         cName: cName,
         buttonFlag1: buttonFlag1,
-        buttonFlag2: buttonFlag2
+        buttonFlag2: buttonFlag2,
+        csrfToken: req.csrfToken()
       });
     });
 });
 
 // それぞれの書籍についての表示
-router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
+router.get('/:categoryId/:key', authenticationEnsurer, csrfProtection, (req, res, next) => {
 
   Category.findOne({
     where: { categoryId: req.params.categoryId }
@@ -259,7 +265,8 @@ router.get('/:categoryId/:key', authenticationEnsurer, (req, res, next) => {
               userId: userId,
               myComment: myComment,　　// promptの初期値に表示するログインユーザーのコメント
               buttonFlag1: buttonFlag1,
-              buttonFlag2: buttonFlag2
+              buttonFlag2: buttonFlag2,
+              csrfToken: req.csrfToken()
             });
 
           } else {

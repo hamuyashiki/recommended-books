@@ -106,7 +106,6 @@ buttonSelfComment.click(function () {
   var bookName = buttonSelfComment.data('book-name');
   var userId = buttonSelfComment.data('user-id');
   var myComment = buttonSelfComment.data('my-comment');
-  console.log(myComment);
   var comment = prompt('コメントを255文字以内で入力してください。', "".concat(myComment));
 
   if (comment) {
