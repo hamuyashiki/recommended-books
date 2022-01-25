@@ -11,7 +11,7 @@ dayjs.extend(timezone);
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  const title = 'おすすめBookくん';
+  const title = 'プログラミング書籍紹介所';
   if (req.user) {
     Category.findAll({
     }).then(categories => {
